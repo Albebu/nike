@@ -1,1 +1,12 @@
-<p>back-office works!</p>
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <label for="reference">Referencia: </label>
+    <input 
+        type="text" 
+        matInput 
+        name="reference" 
+        formControlName="reference"
+        [(ngModel)]="reference"
+        class="outline-2 rounded-lg">
+
+    @if (reference) {{{reference}}}
+</form>
