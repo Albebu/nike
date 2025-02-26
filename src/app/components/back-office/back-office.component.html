@@ -1,12 +1,88 @@
-<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-    <label for="reference">Referencia: </label>
-    <input 
-        type="text" 
-        matInput 
-        name="reference" 
-        formControlName="reference"
-        [(ngModel)]="reference"
-        class="outline-2 rounded-lg">
+<div
+  class="flex flex-col justify-end max-w-[50%] items-center">
+  <div class="items-start">
+     <form
+  [formGroup]="productForm"
+  (ngSubmit)="onSubmit()"
+  class="flex flex-col gap-4">
+       <div class="">
+	 <label for="reference">Referencia: </label>
+	 <input 
+           type="text" 
+           matInput 
+           name="reference" 
+           formControlName="reference"
+           class="outline-2 rounded-lg pl-2 pr-2 w-64 justify-self-end">
+	 </div>
+       <div>
+	 
+	 <label for="productName">Nombre del producto: </label>
+	 <input
+	   type="text"
+	   name="productName"
+	   formControlName="productName"
+	   class="outline-2 rounded-lg">
+       </div>
 
-    @if (reference) {{{reference}}}
+       <div>
+	 
+	 <label for="price">Precio: </label>
+	 <input
+	   type="number"
+	   name="productPrice"
+	   formControlName="productPrice"
+	   class="outline-2 rounded-lg">
+       </div>
+       
+       
+       <div>
+	 <label for="description">Descripción </label>
+	 <input
+	   type="text"
+	   name="productDescription"
+	   formControlName="productDescription"
+	   class="outline-2 rounded-lg">
+       </div>
+       
+       <div> 
+	 <label for="productType">Tipo de producto </label>
+	 <datalist id="productType">
+	   <option value="Zapatillas para el día a día"></option>
+	   <option value="Zapatillas Jordan"></option>
+	   <option value="Zapatillas de running"></option>
+	   <option value="Zapatillas de fútbol"></option>
+	   <option value="Zapatillas de baloncesto"></option>
+	   <option value="Zapatilas para gym y training"></option>
+	   <option value="Zapatillas de skateboard"></option>
+	 </datalist>
+	 <input
+	   list="productType"
+	   name="productType"
+	   formControlName="productType"
+	   class="outline-2 rounded-lg">
+       </div>
+
+       <div>
+	 <label for="onSale">En oferta:  </label>
+	 <input
+	   type="checkbox"
+	   name="onSale"
+	   formControlName="onSale">
+       </div>
+
+       <div>        
+	 <label for="productImage">Imagen:  </label>
+	 <input
+	   type="text"
+	   name="productImage"
+	   formControlName="productImage">
+       </div>
+       
+       <input
+	 type="submit"
+	 value="Agregar producto"
+	 [disabled]="productForm.invalid">
+
 </form>
+  </div>
+</div>

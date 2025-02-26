@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Validators, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 interface Product {
   reference: string;
@@ -13,21 +13,20 @@ interface Product {
 
 @Component({
   selector: 'app-back-office',
+  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './back-office.component.html',
   styleUrls: ['./back-office.component.css']
 })
 export class BackOfficeComponent {
-  reference: string = "";
-
   productForm = new FormGroup({
-    reference: new FormControl(''),
-    name: new FormControl(''),
-    price: new FormControl(0),
-    description: new FormControl(''),
-    category: new FormControl(''),
-    sale: new FormControl(false),
-    image: new FormControl(''),
+    reference: new FormControl('', Validators.required),
+    productName: new FormControl('', Validators.required),
+    productPrice: new FormControl(0, [Validators.required, Validators.min(1)]),
+    productDescription: new FormControl(''),
+    productType: new FormControl(''),
+    onSale: new FormControl(false),
+    productImage: new FormControl(''),
   });
 
   onSubmit() {
