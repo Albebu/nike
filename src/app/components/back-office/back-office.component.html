@@ -1,88 +1,123 @@
-<div
-  class="flex flex-col justify-end max-w-[50%] items-center">
-  <div class="items-start">
-     <form
-  [formGroup]="productForm"
-  (ngSubmit)="onSubmit()"
-  class="flex flex-col gap-4">
-       <div class="">
-	 <label for="reference">Referencia: </label>
-	 <input 
-           type="text" 
-           matInput 
-           name="reference" 
-           formControlName="reference"
-           class="outline-2 rounded-lg pl-2 pr-2 w-64 justify-self-end">
-	 </div>
-       <div>
-	 
-	 <label for="productName">Nombre del producto: </label>
-	 <input
-	   type="text"
-	   name="productName"
-	   formControlName="productName"
-	   class="outline-2 rounded-lg">
-       </div>
-
-       <div>
-	 
-	 <label for="price">Precio: </label>
-	 <input
-	   type="number"
-	   name="productPrice"
-	   formControlName="productPrice"
-	   class="outline-2 rounded-lg">
-       </div>
-       
-       
-       <div>
-	 <label for="description">Descripción </label>
-	 <input
-	   type="text"
-	   name="productDescription"
-	   formControlName="productDescription"
-	   class="outline-2 rounded-lg">
-       </div>
-       
-       <div> 
-	 <label for="productType">Tipo de producto </label>
-	 <datalist id="productType">
-	   <option value="Zapatillas para el día a día"></option>
-	   <option value="Zapatillas Jordan"></option>
-	   <option value="Zapatillas de running"></option>
-	   <option value="Zapatillas de fútbol"></option>
-	   <option value="Zapatillas de baloncesto"></option>
-	   <option value="Zapatilas para gym y training"></option>
-	   <option value="Zapatillas de skateboard"></option>
-	 </datalist>
-	 <input
-	   list="productType"
-	   name="productType"
-	   formControlName="productType"
-	   class="outline-2 rounded-lg">
-       </div>
-
-       <div>
-	 <label for="onSale">En oferta:  </label>
-	 <input
-	   type="checkbox"
-	   name="onSale"
-	   formControlName="onSale">
-       </div>
-
-       <div>        
-	 <label for="productImage">Imagen:  </label>
-	 <input
-	   type="text"
-	   name="productImage"
-	   formControlName="productImage">
-       </div>
-       
-       <input
-	 type="submit"
-	 value="Agregar producto"
-	 [disabled]="productForm.invalid">
-
-</form>
-  </div>
+<div class="flex flex-col min-h-screen">
+  <main class="flex-grow flex items-center justify-center">
+    <div class="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label for="reference" class="block font-semibold mb-1">
+            Referencia:
+          </label>
+          <input
+            type="text"
+            matInput
+            name="reference"
+            formControlName="reference"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+          @if(productForm.controls.reference.invalid &&
+          productForm.controls.reference.touched) {
+          <span class="text-red-500 absolute ml-4">El campo esta mal</span>
+          }
+        </div>
+        <div>
+          <label for="productName" class="block font-semibold mb-1">
+            Nombre del producto:
+          </label>
+          <input
+            type="text"
+            name="productName"
+            formControlName="productName"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+          @if(productForm.controls.productName.invalid &&
+          productForm.controls.productName.touched) {
+          <span class="text-red-500 absolute ml-4">El campo esta mal</span>
+          }
+        </div>
+        <div>
+          <label for="price" class="block font-semibold mb-1"> Precio: </label>
+          <input
+            type="number"
+            name="productPrice"
+            formControlName="productPrice"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+          @if(productForm.controls.productPrice.invalid &&
+          productForm.controls.productPrice.touched) {
+          <span class="text-red-500 absolute ml-4">El campo esta mal</span>
+          }
+        </div>
+        <div>
+          <label for="description" class="block font-semibold mb-1">
+            Descripción:
+          </label>
+          <input
+            type="text"
+            name="productDescription"
+            formControlName="productDescription"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+          @if(productForm.controls.productDescription.invalid &&
+          productForm.controls.productDescription.touched) {
+          <span class="text-red-500 absolute ml-4">El campo esta mal</span>
+          }
+        </div>
+        <div>
+          <label for="productType" class="block font-semibold mb-1">
+            Tipo de producto:
+          </label>
+          <datalist id="productType">
+            <option value="Zapatillas para el día a día"></option>
+            <option value="Zapatillas Jordan"></option>
+            <option value="Zapatillas de running"></option>
+            <option value="Zapatillas de fútbol"></option>
+            <option value="Zapatillas de baloncesto"></option>
+            <option value="Zapatilas para gym y training"></option>
+            <option value="Zapatillas de skateboard"></option>
+          </datalist>
+          <input
+            list="productType"
+            name="productType"
+            formControlName="productType"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+          @if(productForm.controls.productType.invalid &&
+          productForm.controls.productType.touched) {
+          <span class="text-red-500 absolute ml-4">El campo esta mal</span>
+          }
+        </div>
+        <div class="flex items-center">
+          <label for="onSale" class="mr-2 font-semibold"> En oferta: </label>
+          <input
+            type="checkbox"
+            name="onSale"
+            formControlName="onSale"
+            class=""
+          />
+        </div>
+        <div>
+          <label for="productImage" class="block font-semibold mb-1">
+            Imagen:
+          </label>
+          <input
+            type="text"
+            name="productImage"
+            formControlName="productImage"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+          @if(productForm.controls.productImage.invalid &&
+          productForm.controls.productImage.touched) {
+          <span class="text-red-500 absolute ml-4">El campo esta mal</span>
+          }
+        </div>
+        <div>
+          <input
+            type="submit"
+            value="Agregar producto"
+            [disabled]="productForm.invalid"
+            class="w-full p-2 rounded-md cursor-pointer bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          />
+        </div>
+      </form>
+    </div>
+  </main>
 </div>
