@@ -1,11 +1,12 @@
+// products.component.ts
 import { Component } from '@angular/core';
+import { ProductService } from '../../services/add-products.service';
 
 @Component({
   selector: 'app-products',
-  imports: [],
+  standalone: true,
   templateUrl: './products.component.html',
-  styleUrl: './products.component.css'
 })
 export class ProductsComponent {
-
+  constructor(public productService: ProductService) {}
 }

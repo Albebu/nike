@@ -5,36 +5,22 @@ import {
   FormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
-
-import { Product, CATEGORIES } from '../../services/models';
-
-const EXISTING_PRODUCTS: Product[] = [
-  {
-    reference: 'RED001',
-    name: 'Jordan 1 negras',
-    price: 120,
-    description: 'bambas negras',
-    category: CATEGORIES.JORDAN,
-    sale: false,
-  },
-  {
-    reference: 'RED002',
-    name: 'Jordan 1 blancas',
-    price: 130,
-    description: 'bambas blancas',
-    category: CATEGORIES.JORDAN,
-    sale: false,
-  },
-];
+import { Product, CATEGORIES } from '../../models';
+import { ProductService } from '../../services/add-products.service';
+import { SupabaseService } from '../../services/supabase.service';
 
 @Component({
   selector: 'app-back-office',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './back-office.component.html',
   styleUrls: ['./back-office.component.css'],
 })
 export class BackOfficeComponent {
+  foundProduct: Product | undefined;
+  imageUrl: string | null = null;
+  supabase: SupabaseService = new SupabaseService();
+  bucket: string = 'images'
+
   productForm = new FormGroup({
     reference: new FormControl('', [
       Validators.required,
@@ -45,25 +31,51 @@ export class BackOfficeComponent {
       Validators.required,
       Validators.minLength(3),
       Validators.maxLength(20),
-      this.uniqueName,
     ]),
     productPrice: new FormControl(0, [Validators.required, Validators.min(1)]),
     productDescription: new FormControl('', [
       Validators.minLength(10),
       Validators.maxLength(255),
     ]),
-    productType: new FormControl(null, [Validators.required]),
+    productType: new FormControl<CATEGORIES | null>(null, [Validators.required]),
     onSale: new FormControl(false, [Validators.nullValidator]),
     productImage: new FormControl(''),
   });
 
-  uniqueName(): Validators {
-    return (control: FormControl) => {
-      const nameExist = EXISTING_PRODUCTS.some(
-        (product) => product.name.toLowerCase() === control.value?.toLowerCase()
-      );
-      return nameExist ? { nameExist: true } : null;
-    };
+  constructor(private productService: ProductService) {}
+
+  uniqueName(control: FormControl) {
+    const products = this.productService.products();
+    const nameExist = products.some(
+      (product) => product.name.toLowerCase() === control.value?.toLowerCase()
+    );
+    return nameExist ? { nameExist: true } : null;
+  }
+
+  checkReference() {
+    const ref = this.productForm.controls.reference.value?.trim();
+    const foundProduct = this.productService.products().find(
+      p => p.reference.includes(ref || "") && ref?.length === p.reference.length
+    );
+
+    if (foundProduct) {
+      this.productForm.controls.reference.setValue(foundProduct.reference || " ");
+      this.productForm.controls.productName.setValue(foundProduct.name || " ");
+      this.productForm.controls.productDescription.setValue(foundProduct.description || " ");
+      this.productForm.controls.productPrice.setValue(foundProduct.price);
+      this.productForm.controls.productType.setValue(foundProduct.category);
+      this.productForm.controls.productImage.setValue(foundProduct.image || " ");
+      console.log(foundProduct);
+    }
+  }
+
+  clearReference() {
+    this.productForm.controls.reference.setValue("");
+    this.productForm.controls.productName.setValue("");
+    this.productForm.controls.productDescription.setValue("");
+    this.productForm.controls.productPrice.setValue(0);
+    this.productForm.controls.productType.setValue(null);
+    this.productForm.controls.productImage.setValue("");
   }
 
   onSubmit() {
@@ -76,13 +88,26 @@ export class BackOfficeComponent {
         category:
           this.productForm.controls.productType.value || CATEGORIES.RUNNING,
         sale: this.productForm.controls.onSale.value || false,
-        image: '',
+        image: this.imageUrl || "", // Ahora imageUrl es un string
       };
 
       console.log(product);
-      EXISTING_PRODUCTS.push(product);
+      this.productService.addProduct(product);
+      console.log(this.productService.getProducts());
     } else {
       console.log('El formulario contiene errores.');
     }
   }
+
+    async onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file: File = input.files[0];
+      console.log('Archivo seleccionado:', file);
+      await this.supabase.uploadImage(file, this.bucket);
+      const url = await this.supabase.getPublicUrl(this.bucket, );
+      this.imageUrl = url; // Asignar el valor resuelto de la promesa
+    }
+  }
+
 }

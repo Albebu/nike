@@ -1,9 +1,8 @@
 // product.service.ts
 import { Injectable, signal } from '@angular/core';
-import { Product, CATEGORIES } from './models'; // Asegúrate de importar tus interfaces/enum
+import { Product, CATEGORIES } from '../models';
 
-// Usamos la lista inicial
-const EXISTING_PRODUCTS: Product[] = [
+const INITIAL_PRODUCTS: Product[] = [
   {
     reference: 'RED001',
     name: 'Jordan 1 negras',
@@ -26,14 +25,15 @@ const EXISTING_PRODUCTS: Product[] = [
   providedIn: 'root',
 })
 export class ProductService {
-  // Definimos un signal privado con la lista inicial
-  private _products = signal<Product[]>(EXISTING_PRODUCTS);
+  // Signal que almacena el listado de productos
+  products = signal<Product[]>(INITIAL_PRODUCTS);
 
-  // Exponemos un signal de solo lectura para que otros componentes puedan suscribirse
-  products = this._products.asReadonly();
-
-  // Método para añadir un producto actualizando el signal
+  // Método para agregar un nuevo producto y actualizar el signal
   addProduct(product: Product) {
-    this._products.update((currentProducts) => [...currentProducts, product]);
+    this.products.update((products) => [...products, product]);
+  }
+
+  getProducts(): Product[] {
+    return this.products();
   }
 }

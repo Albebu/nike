@@ -1,1 +1,21 @@
-<p>products works!</p>
+<div class="flex flex-col items-center p-4 bg-gray-100 rounded-md">
+    <h3 class="text-2xl font-bold mb-4">Lista de productos</h3>
+    <div class="w-full max-w-md bg-white shadow-md rounded-lg p-4 ">
+        @for (product of productService.products(); track $index) {
+            <div class="pb-4">
+                <div class="flex flex-row justify-between ">
+                    <p class="font-bold">
+                        {{product.name}}
+                    </p>
+                    <p>
+                        {{product.price}}
+                    </p>
+                </div>
+                <p class="text-xs font-semibold">{{product.description}}</p>
+                @if (product.image) {
+                <img src="{{product.image}}" alt="Imagen del producto">
+                }
+            </div>
+        }
+    </div>
+</div>
