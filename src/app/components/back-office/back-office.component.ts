@@ -76,7 +76,11 @@ export class BackOfficeComponent {
     this.productForm.controls.productPrice.setValue(0);
     this.productForm.controls.productType.setValue(null);
     this.productForm.controls.productImage.setValue("");
+
+    this.productForm.reset();
+    this.productForm.markAsUntouched();
   }
+
 
   onSubmit() {
     if (this.productForm.valid) {
@@ -94,20 +98,28 @@ export class BackOfficeComponent {
       console.log(product);
       this.productService.addProduct(product);
       console.log(this.productService.getProducts());
+      this.productForm.markAsUntouched();
+      this.productForm.reset();
     } else {
       console.log('El formulario contiene errores.');
     }
   }
 
     async onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file: File = input.files[0];
-      console.log('Archivo seleccionado:', file);
-      await this.supabase.uploadImage(file, this.bucket);
-      const url = await this.supabase.getPublicUrl(this.bucket, );
-      this.imageUrl = url; // Asignar el valor resuelto de la promesa
+      const input = event.target as HTMLInputElement;
+
+      if (input.files && input.files.length > 0) {
+        const file: File = input.files[0];
+        console.log('Archivo seleccionado:', file);
+
+        const filePath = `imagenes/${file.name}`;
+        console.log('filePath: ', filePath);
+
+        await this.supabase.uploadImage(file, this.bucket);
+        const url = await this.supabase.getPublicUrl(this.bucket, filePath);
+        this.imageUrl = url;
+      }
     }
+
   }
 
-}
