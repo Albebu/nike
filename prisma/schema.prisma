@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User roles
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+model cart {
+  id             Int        @id @default(autoincrement())
+  userId         Int        @unique(map: "Cart_userId_key")
+  expirationDate DateTime
+  user           user       @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Cart_userId_fkey")
+  cartitem       cartitem[]
+}
+
+model cartitem {
+  id               Int     @id @default(autoincrement())
+  cartId           Int
+  productReference String
+  quantity         Int
+  cart             cart    @relation(fields: [cartId], references: [id], onDelete: Cascade, map: "CartItem_cartId_fkey")
+  product          product @relation(fields: [productReference], references: [reference], onDelete: Cascade, map: "CartItem_productReference_fkey")
+
+  @@unique([cartId, productReference], map: "CartItem_cartId_productReference_key")
+  @@index([productReference], map: "CartItem_productReference_fkey")
+}
+
+model product {
+  id           Int              @id @default(autoincrement())
+  reference    String           @unique(map: "Product_reference_key")
+  name         String
+  description  String
+  category     product_category
+  price        Float
+  sale         Boolean?
+  image        String?
+  stock        Int
+  cartitem     cartitem[]
+  purchaseitem purchaseitem[]
+}
+
+model purchase {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  totalPrice   Float
+  date         DateTime       @default(now())
+  user         user           @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Purchase_userId_fkey")
+  purchaseitem purchaseitem[]
+
+  @@index([userId], map: "Purchase_userId_fkey")
+}
+
+model purchaseitem {
+  id               Int      @id @default(autoincrement())
+  purchaseId       Int
+  productReference String
+  quantity         Int
+  product          product  @relation(fields: [productReference], references: [reference], onDelete: Cascade, map: "PurchaseItem_productReference_fkey")
+  purchase         purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade, map: "PurchaseItem_purchaseId_fkey")
+
+  @@unique([purchaseId, productReference], map: "PurchaseItem_purchaseId_productReference_key")
+  @@index([productReference], map: "PurchaseItem_productReference_fkey")
+}
+
+model user {
+  id       Int        @id @default(autoincrement())
+  name     String
+  email    String     @unique(map: "User_email_key")
+  password String
+  role     user_role  @default(CUSTOMER)
+  cart     cart?
+  purchase purchase[]
+}
+
+enum product_category {
+  DAILY
+  JORDAN
+  RUNNING
+  FUTBOL
+  BASKETBALL
+  GYM
+  SKATE
+}
+
+enum user_role {
+  ADMIN
+  CUSTOMER
+}

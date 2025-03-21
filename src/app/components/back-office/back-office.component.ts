@@ -22,18 +22,18 @@ export class BackOfficeComponent {
   bucket: string = 'images'
 
   productForm = new FormGroup({
-    reference: new FormControl('', [
+    reference: new FormControl<string> ('', [
       Validators.required,
       Validators.minLength(3),
       Validators.maxLength(50),
     ]),
-    productName: new FormControl('', [
+    productName: new FormControl<string>('', [
       Validators.required,
       Validators.minLength(3),
       Validators.maxLength(20),
     ]),
-    productPrice: new FormControl(0, [Validators.required, Validators.min(1)]),
-    productDescription: new FormControl('', [
+    productPrice: new FormControl<number>(0, [Validators.required, Validators.min(1)]),
+    productDescription: new FormControl<string>('', [
       Validators.minLength(10),
       Validators.maxLength(255),
     ]),
