@@ -42,15 +42,20 @@
           <li class="border-r-1 pr-2">
             <a routerLink="/products">Productos</a>
           </li>
-          <li class="border-r-1 pr-2">
-            <a routerLink="/login">Iniciar sesión</a>
-          </li>
-          <li class="border-r-1 pr-2">
-            <a routerLink="/register">Registrarse</a>
-          </li>
-          <li class="border-r-1 pr-2">
-            <a routerLink="/back-office">Administrador</a>
-          </li>
+          @if (!auth.isAuthenticated()) {
+            <li class="border-r-1 pr-2">
+              <a routerLink="/login">Iniciar sesión</a>
+            </li>
+            <li class="border-r-1 pr-2">
+              <a routerLink="/register">Registrarse</a>
+            </li>
+          }
+
+          @if (auth.isAuthenticated()) {
+            <li class="border-r-1 pr-2">
+              <a routerLink="/logout">Cerrar sesión</a>
+            </li>
+          }
         </ul>
       </div>
     </div>

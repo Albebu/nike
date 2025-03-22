@@ -2,8 +2,8 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import cors from 'cors'
-import { PrismaClient, Role } from '@prisma/client'
-import { hash } from 'crypto';
+import pkg from '@prisma/client'
+const { PrismaClient, user_role } = pkg;
 
 const prisma = new PrismaClient();
 const app = express();
@@ -35,7 +35,7 @@ app.post('/api/login', async (req, res) => {
         const encryptedUser = jwt.sign(prepUser, JWT_SECRET);
         res.status(200).json({ 
             message: 'Authenticated sucsesfully',
-            user: encryptedUser
+            token: encryptedUser
         })
     } catch(e) {
         console.error('Error during login: ', e);
@@ -58,7 +58,7 @@ app.post('/api/register', async (req, res) => {
                 name,
                 email,
                 password: hashedPassword,
-                role: Role.CUSTOMER
+                role: user_role
             }
         })
 
@@ -73,7 +73,7 @@ app.post('/api/register', async (req, res) => {
 
         return res.status(201).json({ 
             message: 'User registered succesfully', 
-            user: encryptedUser
+            token: encryptedUser
         })
     } catch (e) {
         console.error('Error during register', e);
@@ -81,17 +81,22 @@ app.post('/api/register', async (req, res) => {
     }
 })
 
-const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'Denied access' });
+app.get('/api/user-info', authenticateToken, (req, res) => {
+  const { role, name, email } = req.user;
+  res.json({ role, name, email });
+});
 
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (e) {
-        res.status(403).json({ message: 'Invalid token' });
-    }
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  console.log(token);
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
 }
 
 app.listen(PORT, () => {

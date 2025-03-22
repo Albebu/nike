@@ -7,80 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User roles
-enum Role {
-  ADMIN
-  CUSTOMER
-}
-
-model cart {
+model Cart {
   id             Int        @id @default(autoincrement())
-  userId         Int        @unique(map: "Cart_userId_key")
+  userId         Int        @unique
   expirationDate DateTime
-  user           user       @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Cart_userId_fkey")
-  cartitem       cartitem[]
+  User           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  CartItem       CartItem[]
 }
 
-model cartitem {
+model CartItem {
   id               Int     @id @default(autoincrement())
   cartId           Int
   productReference String
   quantity         Int
-  cart             cart    @relation(fields: [cartId], references: [id], onDelete: Cascade, map: "CartItem_cartId_fkey")
-  product          product @relation(fields: [productReference], references: [reference], onDelete: Cascade, map: "CartItem_productReference_fkey")
+  Cart             Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  Product          Product @relation(fields: [productReference], references: [reference], onDelete: Cascade)
 
-  @@unique([cartId, productReference], map: "CartItem_cartId_productReference_key")
+  @@unique([cartId, productReference])
   @@index([productReference], map: "CartItem_productReference_fkey")
 }
 
-model product {
+model Product {
   id           Int              @id @default(autoincrement())
-  reference    String           @unique(map: "Product_reference_key")
+  reference    String           @unique
   name         String
   description  String
-  category     product_category
+  category     Product_category
   price        Float
   sale         Boolean?
   image        String?
   stock        Int
-  cartitem     cartitem[]
-  purchaseitem purchaseitem[]
+  CartItem     CartItem[]
+  PurchaseItem PurchaseItem[]
 }
 
-model purchase {
+model Purchase {
   id           Int            @id @default(autoincrement())
   userId       Int
   totalPrice   Float
   date         DateTime       @default(now())
-  user         user           @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Purchase_userId_fkey")
-  purchaseitem purchaseitem[]
+  User         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  PurchaseItem PurchaseItem[]
 
   @@index([userId], map: "Purchase_userId_fkey")
 }
 
-model purchaseitem {
+model PurchaseItem {
   id               Int      @id @default(autoincrement())
   purchaseId       Int
   productReference String
   quantity         Int
-  product          product  @relation(fields: [productReference], references: [reference], onDelete: Cascade, map: "PurchaseItem_productReference_fkey")
-  purchase         purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade, map: "PurchaseItem_purchaseId_fkey")
+  Product          Product  @relation(fields: [productReference], references: [reference], onDelete: Cascade)
+  Purchase         Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
 
-  @@unique([purchaseId, productReference], map: "PurchaseItem_purchaseId_productReference_key")
+  @@unique([purchaseId, productReference])
   @@index([productReference], map: "PurchaseItem_productReference_fkey")
 }
 
-model user {
+model User {
   id       Int        @id @default(autoincrement())
   name     String
-  email    String     @unique(map: "User_email_key")
+  email    String     @unique
   password String
-  role     user_role  @default(CUSTOMER)
-  cart     cart?
-  purchase purchase[]
+  role     User_role  @default(CUSTOMER)
+  Cart     Cart?
+  Purchase Purchase[]
 }
 
-enum product_category {
+enum User_role {
+  ADMIN
+  CUSTOMER
+}
+
+enum Product_category {
   DAILY
   JORDAN
   RUNNING
@@ -88,9 +87,4 @@ enum product_category {
   BASKETBALL
   GYM
   SKATE
-}
-
-enum user_role {
-  ADMIN
-  CUSTOMER
 }

@@ -1,24 +1,27 @@
-<div id="login">
-    <form [formGroup]="loginForm" (ngSubmit)="login()">
-        <h1>Login</h1>
-        <label for="email">Email</label>
-        <input 
-            type="email"
-            formControlName="email"
-            name="email"
-            placeholder="example@exa..."
-            required
-            >
+<div id="login" class="min-h-screen flex items-center justify-center bg-gray-100">
+    <form [formGroup]="loginForm" (ngSubmit)="login()"
+        class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md flex flex-col gap-5">
+        <h1 class="text-3xl font-bold text-center text-gray-800">Iniciar sesión</h1>
 
-            <label for="password">Password</label>
-            <input 
-                type="password"
-                formControlName="password"
-                name="password"
-                placeholder="Am1s3b..."
-                required
-                >
-            
-            <button type="submit">Log in</button>
+        <div class="flex flex-col gap-1">
+            <label for="email" class="text-sm text-gray-600">Email</label>
+            <input type="email" formControlName="email" name="email" placeholder="example@domain.com"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <label for="password" class="text-sm text-gray-600">Contraseña</label>
+            <input type="password" formControlName="password" name="password" placeholder="••••••••"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        </div>
+
+                @if (errors) {
+                <span class="text-red-500">{{errors}}</span>
+                }
+
+        <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-300 hover:cursor-pointer">
+            Iniciar sesión
+        </button>
     </form>
 </div>

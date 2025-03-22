@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Http2Server } from 'http2';
-import { Observable } from 'rxjs';
+import { tap, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,17 +8,59 @@ import { Observable } from 'rxjs';
 export class AuthService {
 
   constructor(private __http: HttpClient) { }
-  readonly __api_url = 'http://localhost:3000';
+  readonly __api_url = 'http://localhost:3000/api';
+
+  isAuthenticated = signal<boolean>(false);
 
   login(email: string, password: string): Observable<any> {
-    return this.__http.post(`${this.__api_url}/login`, { email, password });
+    return this.__http.post(`${this.__api_url}/login`, { email, password }).pipe(
+      tap((response: any) => {
+        localStorage.setItem('token', response.token); // ✅ nombre correcto
+        this.isAuthenticated.set(true);
+      })
+    );
   }
 
-  register(name: string, email: string, password: string) {
+  getUserInfo(): Observable<any> {
+    const token = localStorage.getItem('token'); // ✅ coincide con el anterior
+
+    if (!token) {
+      throw new Error('Token no disponible');
+    }
+
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+
+    return this.__http.get(`${this.__api_url}/user-info`, { headers });
+  }
+
+  restoreSession(): void {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+      this.isAuthenticated.set(true);
+    } else {
+      this.isAuthenticated.set(false)
+    }
+    }
+  }
+
+  register(name: string, email: string, password: string): Observable<any> {
     return this.__http.post(`${this.__api_url}/register`, {
-      name, email, password
-    })
+      name,
+      email,
+      password
+    }).pipe(
+      tap((response: any) => {
+        localStorage.setItem('token', response.token); // 👈 guardar token, no user
+        this.isAuthenticated.set(true);
+      })
+    );
   }
 
-  
+  logout() {
+    localStorage.removeItem('token');
+    this.isAuthenticated.set(false);
+  }
 }
