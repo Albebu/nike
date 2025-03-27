@@ -99,6 +99,131 @@ function authenticateToken(req, res, next) {
   });
 }
 
+app.get('/api/products', async (req, res) => {
+    try {
+        const products = await prisma.product.findMany();
+        return res.status(200).json(products);
+    } catch (error) {
+        console.error("Error obteniendo el producto", error);
+    }
+})
+
+app.post('/api/products', async (req, res) => {
+    try {
+        console.log("POST-PRODUCTS: ", req.body);
+        const {
+            reference,
+            name, 
+            price,
+            description,
+            category,
+            onSale,
+            stock,
+            image,
+        } = req.body;
+        await prisma.product.create({
+            data: {
+                reference,
+                name,
+                price,
+                description,
+                category,
+                onSale,
+                stock,
+                image
+            }
+        })
+    } catch (error) {
+        console.error("Error guardando el producto", error);
+    }
+})
+
+app.delete('/api/products/:reference', async (req, res) => {
+    try {
+        const {reference} = req.params;
+
+        await prisma.product.delete({
+            where: { 
+                reference: reference,
+            },
+        })
+        
+        return res.status(201).json({ message: "Producto eliminado correctamente" });
+    } catch (error) {
+        console.error ("Erorr eliminando el producto", error);
+        return res.status(500).json({ message: "Error eliminando el producto"})
+    }
+})
+app.post('/api/cart', async (req, res) => {
+  const { reference } = req.body;
+  const { email } = req.body;
+
+  try {
+    // Obtener usuario
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
+    // Verificar si existe el producto
+    const product = await prisma.product.findUnique({ where: { reference } });
+    if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
+
+    // Buscar carrito existente
+    let cart = await prisma.cart.findUnique({ where: { userId: user.id } });
+
+    // Crear carrito si no existe
+    if (!cart) {
+      const expirationDate = new Date(Date.now() + 10 * 60 * 1000);
+      cart = await prisma.cart.create({
+        data: {
+          userId: user.id,
+          expirationDate
+        }
+      });
+    }
+
+    // Buscar si el producto ya está en el carrito
+    const existingItem = await prisma.cartItem.findUnique({
+      where: {
+        cartId_productReference: {
+          cartId: cart.id,
+          productReference: reference
+        }
+      }
+    });
+
+    // Actualizar o insertar CartItem
+    if (existingItem) {
+      await prisma.cartItem.update({
+        where: {
+          cartId_productReference: {
+            cartId: cart.id,
+            productReference: reference
+          }
+        },
+        data: {
+          quantity: { increment: 1 }
+        }
+      });
+    } else {
+      await prisma.cartItem.create({
+        data: {
+          cartId: cart.id,
+          productReference: reference,
+          quantity: 1
+        }
+      });
+    }
+
+    return res.status(200).json({ message: "Producto añadido al carrito correctamente" });
+
+  } catch (error) {
+    console.error("Error al gestionar el carrito:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+});
+
+
+
 app.listen(PORT, () => {
     console.log("Server running on port: ", PORT);
 })
