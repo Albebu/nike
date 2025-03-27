@@ -38,6 +38,8 @@ export class LoginComponent {
     const email = this.loginForm.get('email')?.value;
     const password = this.loginForm.get('password')?.value;
 
+    console.log(email, password);
+
     if (!email || !password) { 
       this.errors = 'Email y contraseña son obligatorios';
       return;

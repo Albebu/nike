@@ -6,6 +6,7 @@ export interface Product {
   category: CATEGORIES;
   sale?: boolean;
   image?: string;
+  stock: number;
 }
 
 export enum CATEGORIES {

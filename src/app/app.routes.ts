@@ -6,6 +6,7 @@ import { LandingComponent } from './components/landing/landing.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { LogoutComponent } from './components/logout/logout.component';
+import { UserComponent } from './components/user/user.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'back-office', component: BackOfficeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent},
-  { path: 'logout', component: LogoutComponent}
+  { path: 'logout', component: LogoutComponent},
+  { path: 'user', component: UserComponent}
 ];

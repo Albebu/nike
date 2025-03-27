@@ -222,7 +222,43 @@ app.post('/api/cart', async (req, res) => {
   }
 });
 
+app.get('/api/cart/items', authenticateToken, async (req, res) => {
+  try {
+    const { email } = req.user;
 
+    // Buscar al usuario por email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Buscar el carrito activo del usuario
+    const cart = await prisma.cart.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!cart) {
+      return res.status(200).json({ items: [] }); // No hay carrito aún
+    }
+
+    // Obtener los items del carrito con datos del producto
+    const items = await prisma.cartItem.findMany({
+      where: { cartId: cart.id },
+      include: {
+        Product: true,
+      },
+    });
+
+    return res.status(200).json({ items });
+
+  } catch (error) {
+    console.error("Error al obtener los items del carrito", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+});
 
 app.listen(PORT, () => {
     console.log("Server running on port: ", PORT);

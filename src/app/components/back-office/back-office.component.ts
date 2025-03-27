@@ -52,6 +52,14 @@ export class BackOfficeComponent {
     return nameExist ? { nameExist: true } : null;
   }
 
+  remove() {
+    const ref = this.productForm.controls.reference.value?.trim();
+    console.log(ref);
+    if (!ref) return
+
+    this.productService.removeProduct(ref);
+  }
+
   checkReference() {
     const ref = this.productForm.controls.reference.value?.trim();
     const foundProduct = this.productService.products().find(
@@ -92,7 +100,8 @@ export class BackOfficeComponent {
         category:
           this.productForm.controls.productType.value || CATEGORIES.RUNNING,
         sale: this.productForm.controls.onSale.value || false,
-        image: this.imageUrl || "", // Ahora imageUrl es un string
+        image: this.imageUrl || "", 
+        stock: 20
       };
 
       console.log(product);

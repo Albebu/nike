@@ -15,6 +15,7 @@
                 @if (product.image) {
                 <img src="{{product.image}}" alt="Imagen del producto">
                 }
+                <button type="button" (click)="addProduct(product.reference)" class="text-black">Añadir producto</button>
             </div>
         }
     </div>

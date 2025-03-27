@@ -15,6 +15,7 @@
           <div class="flex flex-row gap-4">
             <button (click)="checkReference()" class="rounded-full bg-black text-white p-2 mt-2 text-xs">Buscar referencia</button>
             <button (click)="clearReference()" class="rounded-full bg-black text-white p-2 pl-4 pr-4 mt-2 text-xs">Limpiar</button>
+            <button (click)="remove()" type="button" class="rounded-full bg-black text-white p-2 pl-4 pr-4 mt-2 text-xs">Eliminar</button>
           </div>
           @if(productForm.controls.reference.invalid &&
           productForm.controls.reference.touched) {
@@ -73,13 +74,15 @@
             Tipo de producto:
           </label>
           <datalist id="productType">
-            <option value="Zapatillas para el día a día"></option>
-            <option value="Zapatillas Jordan"></option>
-            <option value="Zapatillas de running"></option>
-            <option value="Zapatillas de fútbol"></option>
-            <option value="Zapatillas de baloncesto"></option>
-            <option value="Zapatilas para gym y training"></option>
-            <option value="Zapatillas de skateboard"></option>
+            <select >
+              <option value="DAILY">Diario</option>
+              <option value="JORDAN">Jordan</option>
+              <option value="RUNNING">Running</option>
+              <option value="FUTBOL">Fútbol</option>
+              <option value="BASKETBALL">Basketball</option>
+              <option value="GYM">Gimnasio</option>
+              <option value="SKATE">Skate</option>
+            </select>
           </datalist>
           <input
             list="productType"
