@@ -14,82 +14,81 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/api/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        
-        const user = await prisma.user.findUnique({
-            where: { email }
-        })
-        if (!user) return res.status(404).json({ message: 'User not found' });
+  try {
+    const { email, password } = req.body;
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) return res.status(403).json({ message: 'Incorrect credentials' });
+    const user = await prisma.user.findUnique({
+      where: { email }
+    })
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-        const prepUser = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-        }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) return res.status(403).json({ message: 'Incorrect credentials' });
 
-        const encryptedUser = jwt.sign(prepUser, JWT_SECRET);
-        res.status(200).json({ 
-            message: 'Authenticated sucsesfully',
-            token: encryptedUser
-        })
-    } catch(e) {
-        console.error('Error during login: ', e);
-        return res.status(500).json({ message: 'Internal server error' });
+    const prepUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
     }
+
+    const encryptedUser = jwt.sign(prepUser, JWT_SECRET);
+    res.status(200).json({
+      message: 'Authenticated sucsesfully',
+      token: encryptedUser
+    })
+  } catch (e) {
+    console.error('Error during login: ', e);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 })
 
 app.post('/api/register', async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-        const existingUser = await prisma.user.findUnique({
-            where: { email }
-        });
-        if (existingUser) return res.status(400).json({ message: 'User alredy exists' });
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+    if (existingUser) return res.status(400).json({ message: 'User alredy exists' });
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await prisma.user.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword,
-                role: user_role
-            }
-        })
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: user_role
+      }
+    })
 
-        const user = {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            role: newUser.role,
-        }
-
-        const encryptedUser = jwt.sign(user, JWT_SECRET);
-
-        return res.status(201).json({ 
-            message: 'User registered succesfully', 
-            token: encryptedUser
-        })
-    } catch (e) {
-        console.error('Error during register', e);
-        return res.status(500).json({ message: 'Error during register' });
+    const user = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
     }
+
+    const encryptedUser = jwt.sign(user, JWT_SECRET);
+
+    return res.status(201).json({
+      message: 'User registered succesfully',
+      token: encryptedUser
+    })
+  } catch (e) {
+    console.error('Error during register', e);
+    return res.status(500).json({ message: 'Error during register' });
+  }
 })
 
 app.get('/api/user-info', authenticateToken, (req, res) => {
   const { role, name, email } = req.user;
-  res.json({ role, name, email });
+  return res.json({ role, name, email });
 });
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  console.log(token);
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
@@ -99,60 +98,79 @@ function authenticateToken(req, res, next) {
   });
 }
 
+app.put('/api/user', authenticateToken, async (req, res) => {
+  try {
+    const { email } = req.user;
+    const { name, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password);
+    const user = await prisma.user.update({
+      where: {
+        email
+      },
+      data: {
+        name: name,
+        password: hashedPassword
+      }
+    })
+    console.log(user);
+  } catch (error) {
+    console.error("Error cambiando la información de usuario", error);
+  }
+})
+
 app.get('/api/products', async (req, res) => {
-    try {
-        const products = await prisma.product.findMany();
-        return res.status(200).json(products);
-    } catch (error) {
-        console.error("Error obteniendo el producto", error);
-    }
+  try {
+    const products = await prisma.product.findMany();
+    return res.status(200).json(products);
+  } catch (error) {
+    console.error("Error obteniendo el producto", error);
+  }
 })
 
 app.post('/api/products', async (req, res) => {
-    try {
-        console.log("POST-PRODUCTS: ", req.body);
-        const {
-            reference,
-            name, 
-            price,
-            description,
-            category,
-            onSale,
-            stock,
-            image,
-        } = req.body;
-        await prisma.product.create({
-            data: {
-                reference,
-                name,
-                price,
-                description,
-                category,
-                onSale,
-                stock,
-                image
-            }
-        })
-    } catch (error) {
-        console.error("Error guardando el producto", error);
-    }
+  try {
+    const {
+      reference,
+      name,
+      price,
+      description,
+      category,
+      onSale,
+      stock,
+      image,
+    } = req.body;
+    await prisma.product.create({
+      data: {
+        reference,
+        name,
+        price,
+        description,
+        category,
+        onSale,
+        stock,
+        image
+      }
+    })
+  } catch (error) {
+    console.error("Error guardando el producto", error);
+  }
 })
 
 app.delete('/api/products/:reference', async (req, res) => {
-    try {
-        const {reference} = req.params;
+  try {
+    const { reference } = req.params;
 
-        await prisma.product.delete({
-            where: { 
-                reference: reference,
-            },
-        })
-        
-        return res.status(201).json({ message: "Producto eliminado correctamente" });
-    } catch (error) {
-        console.error ("Erorr eliminando el producto", error);
-        return res.status(500).json({ message: "Error eliminando el producto"})
-    }
+    await prisma.product.delete({
+      where: {
+        reference: reference,
+      },
+    })
+
+    return res.status(201).json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    console.error("Erorr eliminando el producto", error);
+    return res.status(500).json({ message: "Error eliminando el producto" })
+  }
 })
 app.post('/api/cart', async (req, res) => {
   const { reference } = req.body;
@@ -193,6 +211,15 @@ app.post('/api/cart', async (req, res) => {
 
     // Actualizar o insertar CartItem
     if (existingItem) {
+      await prisma.product.update({
+        where: {
+          reference
+        },
+        data: {
+          stock: { decrement: 1 }
+        }
+      })
+
       await prisma.cartItem.update({
         where: {
           cartId_productReference: {
@@ -261,5 +288,5 @@ app.get('/api/cart/items', authenticateToken, async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log("Server running on port: ", PORT);
+  console.log("Server running on port: ", PORT);
 })

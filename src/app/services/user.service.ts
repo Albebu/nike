@@ -11,14 +11,14 @@ export class UserService {
   constructor(private __http: HttpClient, private __auth: AuthService) { }
 
   getCartItems(): Observable<any> {
-  const token = localStorage.getItem('token');
-  if (!token) throw new Error('Token no disponible');
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Token no disponible');
 
-  const headers = {
-    Authorization: `Bearer ${token}`
-  };
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
 
-  return this.__http.get('http://localhost:3000/api/cart/items', { headers });
-}
+    return this.__http.get('http://localhost:3000/api/cart/items', { headers });
+  }
 
 }

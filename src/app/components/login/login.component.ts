@@ -44,6 +44,7 @@ export class LoginComponent {
       this.errors = 'Email y contraseña son obligatorios';
       return;
     }
+    
     this.__auth.login(email, password).subscribe({
       next: () => {
         this.__auth.getUserInfo().subscribe(user => {

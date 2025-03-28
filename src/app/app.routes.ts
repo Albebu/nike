@@ -11,7 +11,7 @@ import { UserComponent } from './components/user/user.component';
 export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'products', component: ProductsComponent },
-  { path: 'back-office', component: BackOfficeComponent },
+  { path: 'back-office', component: BackOfficeComponent, canActivate: []},
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent},
   { path: 'logout', component: LogoutComponent},

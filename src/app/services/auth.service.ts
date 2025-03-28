@@ -11,14 +11,24 @@ export class AuthService {
   readonly __api_url = 'http://localhost:3000/api';
 
   isAuthenticated = signal<boolean>(false);
+  isAdmin = signal<boolean>(false);
 
   login(email: string, password: string): Observable<any> {
     return this.__http.post(`${this.__api_url}/login`, { email, password }).pipe(
       tap((response: any) => {
-        localStorage.setItem('token', response.token); // ✅ nombre correcto
+        localStorage.setItem('token', response.token);
         this.isAuthenticated.set(true);
+        this.setRole();
       })
     );
+  }
+
+  setRole() {
+    this.getUserInfo().subscribe({
+      next: (userData) => {
+        if (userData.role === 'Admin') this.isAdmin.set(true);
+      }
+    })
   }
 
   getUserInfo(): Observable<any> {
@@ -39,10 +49,10 @@ export class AuthService {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {
-      this.isAuthenticated.set(true);
-    } else {
-      this.isAuthenticated.set(false)
-    }
+        this.isAuthenticated.set(true);
+      } else {
+        this.isAuthenticated.set(false)
+      }
     }
   }
 
