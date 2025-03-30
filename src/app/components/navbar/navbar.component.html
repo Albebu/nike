@@ -59,6 +59,12 @@
               <a routerLink="/user">Perfil</a>
             </li>
           }
+
+          @if (auth.isAdmin()) {
+            <li class="border-r-1 pr-2">
+              <a routerLink="/back-office">Administración</a>
+            </li>
+          }
         </ul>
       </div>
     </div>

@@ -287,6 +287,54 @@ app.get('/api/cart/items', authenticateToken, async (req, res) => {
   }
 });
 
+setInterval(async () => {
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000); // Hace 10 minutos
+
+  console.log("Eliminando elementos con createdAt < ", tenMinutesAgo.toISOString());
+
+  const carts = await prisma.cart.findMany({
+    where: {
+      expirationDate: {
+        lt: tenMinutesAgo
+      }
+    }
+  })
+  console.log(carts);
+
+  carts.forEach(async cart => {
+    const items = await prisma.cartItem.findMany({
+      where: {
+        cartId: cart.id
+      }
+    })
+    console.log(items)
+
+    items.forEach(async item => {
+      await prisma.product.update({
+        where: {
+          reference: item.productReference
+        },
+        data: {
+          stock: {
+            increment: 1
+          }
+        }
+      })
+    })
+  });
+
+  const deletedItems = await prisma.cart.deleteMany({
+    where: {
+      expirationDate: {
+        lt: tenMinutesAgo,
+      },
+    },
+  });
+
+  console.log("Carritos eliminados:", deletedItems.count);
+}, 1000);
+
+
 app.listen(PORT, () => {
   console.log("Server running on port: ", PORT);
 })

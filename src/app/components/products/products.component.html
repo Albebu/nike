@@ -10,12 +10,15 @@
                     <p>
                         {{product.price}}
                     </p>
+                    <p>
+                        {{product.stock}}
+                    </p>
                 </div>
                 <p class="text-xs font-semibold">{{product.description}}</p>
                 @if (product.image) {
                 <img src="{{product.image}}" alt="Imagen del producto">
                 }
-                @if(__auth.isAuthenticated()) {
+                @if(__auth.isAuthenticated() && product.stock > 0) {
                     <button type="button" (click)="addProduct(product.reference)" class="text-black">Añadir producto</button>
                 }
             </div>

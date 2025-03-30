@@ -19,6 +19,11 @@ export class ProductsComponent {
   }
 
   addProduct(reference: string): void {
+    this.productService.products.update((currentProducts) =>
+      currentProducts.map((product) => ({
+        ...product,
+        stock: product.stock - 1
+      })));
     this.__auth.getUserInfo().subscribe({
       next: (userData) => {
         const email = userData.email;

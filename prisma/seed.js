@@ -37,29 +37,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var client_1 = require("@prisma/client");
+var bcrypt = require("bcrypt");
 var prisma = new client_1.PrismaClient();
 function main() {
     return __awaiter(this, void 0, void 0, function () {
+        var hashedPassword;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, prisma.user.createMany({
-                        data: [
-                            {
-                                name: 'Admin User',
-                                email: 'admin@example.com',
-                                password: 'hashedpassword123', // Asegúrate de encriptarlo si es para producción
-                                role: 'ADMIN',
-                            },
-                            {
-                                name: 'Cliente Ejemplo',
-                                email: 'cliente@example.com',
-                                password: 'hashedpassword456',
-                                role: 'CUSTOMER',
-                            },
-                        ],
-                        skipDuplicates: true, // Evita errores si ya existen usuarios con el mismo email
-                    })];
+                case 0: return [4 /*yield*/, bcrypt.hash("Monlau2024", 10)];
                 case 1:
+                    hashedPassword = _a.sent();
+                    return [4 /*yield*/, prisma.user.createMany({
+                            data: [
+                                {
+                                    name: 'Admin User',
+                                    email: 'admin@example.com',
+                                    password: hashedPassword, // Asegúrate de encriptarlo si es para producción
+                                    role: 'ADMIN',
+                                },
+                                {
+                                    name: 'Cliente Ejemplo',
+                                    email: 'cliente@example.com',
+                                    password: hashedPassword,
+                                    role: 'CUSTOMER',
+                                },
+                            ],
+                        })];
+                case 2:
                     _a.sent();
                     return [2 /*return*/];
             }

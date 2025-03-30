@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap, Observable } from 'rxjs';
+import { tap, Observable, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,25 +14,24 @@ export class AuthService {
   isAdmin = signal<boolean>(false);
 
   login(email: string, password: string): Observable<any> {
-    return this.__http.post(`${this.__api_url}/login`, { email, password }).pipe(
-      tap((response: any) => {
+    return this.__http.post<{ token: string }>(`${this.__api_url}/login`, { email, password }).pipe(
+      tap((response) => {
+        console.log('Token recibido:', response.token);
         localStorage.setItem('token', response.token);
         this.isAuthenticated.set(true);
-        this.setRole();
+      }),
+      switchMap(() => this.getUserInfo()), // Espera el token antes de llamar a getUserInfo()
+      tap((userData) => {
+        console.log('Usuario autenticado:', userData);
+        if (userData.role === 'ADMIN') {
+          this.isAdmin.set(true);
+        }
       })
     );
   }
 
-  setRole() {
-    this.getUserInfo().subscribe({
-      next: (userData) => {
-        if (userData.role === 'Admin') this.isAdmin.set(true);
-      }
-    })
-  }
-
   getUserInfo(): Observable<any> {
-    const token = localStorage.getItem('token'); // ✅ coincide con el anterior
+    const token = localStorage.getItem('token');
 
     if (!token) {
       throw new Error('Token no disponible');
@@ -65,6 +64,13 @@ export class AuthService {
       tap((response: any) => {
         localStorage.setItem('token', response.token); // 👈 guardar token, no user
         this.isAuthenticated.set(true);
+      }),
+      switchMap(() => this.getUserInfo()), // Espera el token antes de llamar a getUserInfo()
+      tap((userData) => {
+        console.log('Usuario autenticado:', userData);
+        if (userData.role === 'ADMIN') {
+          this.isAdmin.set(true);
+        }
       })
     );
   }
@@ -72,5 +78,6 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     this.isAuthenticated.set(false);
+    this.isAdmin.set(false);
   }
 }
